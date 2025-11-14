@@ -48,7 +48,6 @@ session_start();
       font-family: 'Poppins', sans-serif;
       font-size: 26px;
       font-weight: 700;
-      letter-spacing: 1px;
     }
 
     nav a {
@@ -69,7 +68,6 @@ session_start();
       text-align: center;
       padding: 90px 20px 100px;
       border-radius: 0 0 80px 80px;
-      position: relative;
     }
 
     .hero h2 {
@@ -125,7 +123,6 @@ session_start();
     .kos-section h3 {
       font-family: 'Poppins', sans-serif;
       font-size: 30px;
-      color: var(--dark);
       margin-bottom: 40px;
     }
 
@@ -140,7 +137,7 @@ session_start();
       border-radius: 20px;
       box-shadow: 0 5px 15px rgba(0,0,0,0.08);
       overflow: hidden;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: 0.3s ease;
     }
 
     .kos-card:hover {
@@ -159,36 +156,6 @@ session_start();
       text-align: left;
     }
 
-    .kos-card h4 {
-      font-family: 'Poppins', sans-serif;
-      margin-bottom: 6px;
-      font-size: 20px;
-      color: var(--dark);
-    }
-
-    .kos-card p {
-      font-size: 15px;
-      margin: 4px 0;
-      color: #555;
-    }
-
-    .kos-card button {
-      margin-top: 10px;
-      background-color: var(--secondary);
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: 0.3s;
-    }
-
-    .kos-card button:hover {
-      background-color: var(--accent);
-      color: var(--dark);
-    }
-
     footer {
       background-color: var(--dark);
       color: white;
@@ -197,88 +164,97 @@ session_start();
       margin-top: 80px;
     }
 
-    footer span {
-      color: var(--accent);
-    }
-
     @media (max-width: 768px) {
-      header {
-        padding: 15px 25px;
-      }
-
-      .hero h2 {
-        font-size: 30px;
-      }
-
       .search-bar input {
         width: 220px;
-      }
-
-      .kos-section {
-        padding: 40px 20px;
       }
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>NgekosAja.id</h1>
-    <nav>
-      <a href="#">Beranda</a>
-      <a href="login.php">Login</a>
-      <a href="register.php">Daftar</a>
-    </nav>
-  </header>
+<header>
+  <h1>NgekosAja.id</h1>
+  <nav>
+    <a href="#">Beranda</a>
+    <a href="login.php">Login</a>
+    <a href="register.php">Daftar</a>
+  </nav>
+</header>
 
-  <section class="hero">
-    <h2>Temukan Kos Impianmu 🌴</h2>
-    <p>Pilihan kos terbaik untuk mahasiswa dan perantau, dengan harga bersahabat dan suasana yang nyaman.</p>
+<section class="hero">
+  <h2>Temukan Kos Impianmu 🌴</h2>
+  <p>Pilihan kos terbaik untuk mahasiswa dan perantau.</p>
 
-    <div class="search-bar">
-      <input type="text" placeholder="Cari lokasi atau nama kos...">
-      <button>Cari Kos</button>
-    </div>
-  </section>
+  <div class="search-bar">
+      <input id="searchInput" type="text" placeholder="Cari lokasi atau nama kos...">
+      <button id="searchBtn">Cari Kos</button>
+  </div>
+</section>
 
-  <section class="kos-section">
-    <h3>Kos Rekomendasi Untukmu</h3>
-    <div class="kos-list">
-      <div class="kos-card">
-        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c" alt="Kos Putri">
-        <div class="info">
-          <h4>Kos Putri Melati</h4>
-          <p>Rp 800.000 / bulan</p>
-          <p>📍 Tembalang, Semarang</p>
-          <button>Detail</button>
-        </div>
-      </div>
+<section class="kos-section">
+  <h3>Kos Rekomendasi Untukmu</h3>
 
-      <div class="kos-card">
-        <img src="https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde" alt="Kos Putra">
-        <div class="info">
-          <h4>Kos Putra Harmoni</h4>
-          <p>Rp 1.000.000 / bulan</p>
-          <p>📍 Banyumanik, Semarang</p>
-          <button>Detail</button>
-        </div>
-      </div>
+  <div class="kos-list">
 
-      <div class="kos-card">
-        <img src="https://images.unsplash.com/photo-1598928506311-c55ded91a20d" alt="Kos Campur">
-        <div class="info">
-          <h4>Kos Amanah</h4>
-          <p>Rp 950.000 / bulan</p>
-          <p>📍 Pedurungan, Semarang</p>
-          <button>Detail</button>
-        </div>
+    <div class="kos-card" data-name="Kos Putri Melati" data-lokasi="Tembalang Semarang">
+      <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c" alt="">
+      <div class="info">
+        <h4>Kos Putri Melati</h4>
+        <p>Rp 800.000 / bulan</p>
+        <p>📍 Tembalang, Semarang</p>
       </div>
     </div>
-  </section>
 
-  <footer>
-    &copy; 2025 <span>NgekosAja.id</span> | Temukan Kos Impianmu 🌿
-  </footer>
+    <div class="kos-card" data-name="Kos Putra Harmoni" data-lokasi="Banyumanik Semarang">
+      <img src="https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde" alt="">
+      <div class="info">
+        <h4>Kos Putra Harmoni</h4>
+        <p>Rp 1.000.000 / bulan</p>
+        <p>📍 Banyumanik, Semarang</p>
+      </div>
+    </div>
 
+    <div class="kos-card" data-name="Kos Amanah" data-lokasi="Pedurungan Semarang">
+      <img src="https://images.unsplash.com/photo-1598928506311-c55ded91a20d" alt="">
+      <div class="info">
+        <h4>Kos Amanah</h4>
+        <p>Rp 950.000 / bulan</p>
+        <p>📍 Pedurungan, Semarang</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  &copy; 2025 NgekosAja.id | Temukan Kos Impianmu 🌿
+</footer>
+
+<!-- ========== JAVASCRIPT SEARCH ========== -->
+<script>
+document.getElementById("searchBtn").addEventListener("click", function () {
+    const query = document.getElementById("searchInput").value.toLowerCase().trim();
+    const cards = document.querySelectorAll(".kos-card");
+
+    cards.forEach(card => {
+        const name = card.dataset.name.toLowerCase();
+        const lokasi = card.dataset.lokasi.toLowerCase();
+
+        card.style.display =
+          (name.includes(query) || lokasi.includes(query))
+          ? "block"
+          : "none";
+    });
+});
+</script>
+
+<script>
+document.getElementById("searchInput").addEventListener("keypress", function (e) {
+    if (e.key === "Enter") {
+        document.getElementById("searchBtn").click();
+    }
+});
+</script>
 </body>
 </html>
