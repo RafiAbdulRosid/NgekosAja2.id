@@ -34,6 +34,34 @@ $stmt = $pdo->prepare("SELECT filename FROM kos_images WHERE kos_id = ? ORDER BY
 $stmt->execute([$id]);
 $images = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
+
+// --- START: LOGIKA REVIEW BARU ---
+
+// 4. Ambil Reviews
+$stmtReview = $pdo->prepare("
+    SELECT r.*, u.fullname 
+    FROM review r 
+    JOIN users u ON r.user_id = u.id 
+    WHERE r.kos_id = ? 
+    ORDER BY r.created_at DESC
+");
+$stmtReview->execute([$id]);
+$reviews = $stmtReview->fetchAll(PDO::FETCH_ASSOC);
+
+// 5. Hitung Rata-rata Rating
+$avgRating = 0;
+if (!empty($reviews)) {
+    $totalRating = array_sum(array_column($reviews, 'rating'));
+    $avgRating = round($totalRating / count($reviews), 1);
+}
+
+// Cek Pesan dari submit_review.php
+$review_message = $_GET['success'] ?? $_GET['error'] ?? '';
+$message_type = isset($_GET['success']) ? 'success' : (isset($_GET['error']) ? 'error' : '');
+
+// --- END: LOGIKA REVIEW BARU ---
+
+
 // Cek Login & Role
 $is_logged_in = !empty($_SESSION['user_id']);
 $current_role = $_SESSION['role'] ?? null;
@@ -45,7 +73,7 @@ if ($is_logged_in && $current_role === 'pemilik' && $_SESSION['user_id'] == $kos
     $backUrl = $baseUrl . 'index.php'; // Kembali ke pencarian utama
 }
 
-$pdo = null;
+$pdo = null; // Tutup koneksi
 ?>
 <!doctype html>
 <html lang="id">
@@ -62,6 +90,8 @@ $pdo = null;
             --bg-light:#F4F8F9;
             --dark:#263238;
             --text-muted:#607D8B;
+            --success:#388E3C;
+            --error:#C62828;
         }
         *{box-sizing:border-box}
         body{font-family:'Nunito Sans',sans-serif;margin:0;background:var(--bg-light);color:var(--dark)}
@@ -89,7 +119,7 @@ $pdo = null;
         /* Info Kos */
         .info h1{font-family:'Poppins',sans-serif; margin:0 0 5px; font-size:28px;}
         .meta{color:var(--text-muted); margin-bottom:15px; font-size:15px;}
-        .price{font-size:24px; font-weight:700; color:#388E3C; margin-bottom:15px;}
+        .price{font-size:24px; font-weight:700; color:var(--success); margin-bottom:15px;}
         .desc{line-height:1.6; color:#555;}
 
         /* Daftar Kamar */
@@ -116,7 +146,7 @@ $pdo = null;
         .btn-primary:hover{background:#FF7043; transform:translateY(-2px);}
         .btn-login{background:#eee; color:#555;}
 
-        /* MODAL STYLE (Yang diperbaiki) */
+        /* MODAL STYLE */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.6);
@@ -136,11 +166,30 @@ $pdo = null;
         
         .form-control-modal{ width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:16px; }
         .close-btn{ background:none; border:none; font-size:24px; cursor:pointer; color:#999; }
+        
+        /* Review Section Style */
+        .review-card h3 { font-family:'Poppins',sans-serif; margin-top:0;}
+        .star-rating { color: gold; }
+        .star-empty { color: #ddd; }
+        .review-item { border-top: 1px dashed #eee; padding: 15px 0; }
+        .review-author { font-weight: 700; color: var(--dark); }
+        .review-meta { color: var(--text-muted); font-size: 13px; margin-top: 5px; }
+        
+        /* Notif Style */
+        .notif { padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; }
+        .notif.success { background: #E8F5E9; color: var(--success); }
+        .notif.error { background: #FFEBEE; color: var(--error); }
     </style>
 </head>
 <body>
 
 <div class="wrap">
+    <?php if ($review_message): ?>
+        <div class="notif <?= $message_type ?>">
+            <?= htmlspecialchars($review_message) ?>
+        </div>
+    <?php endif; ?>
+
     <div class="topbar">
         <a href="<?= $baseUrl ?>index.php" class="logo">NgekosAja.id</a>
         <div>
@@ -217,7 +266,59 @@ $pdo = null;
                     <p>Belum ada data kamar.</p>
                 <?php endif; ?>
             </div>
-        </div>
+            
+            <div class="card review-card" style="margin-top:20px;">
+                <h3>⭐️ Berikan Ulasan Anda</h3>
+                <?php if ($is_logged_in && $current_role === 'pencari'): ?>
+                    <form action="<?= $baseUrl ?>kos/submit_review.php" method="post">
+                        <input type="hidden" name="kos_id" value="<?= $id ?>">
+                        
+                        <div style="margin-bottom:15px;">
+                            <label style="display:block; margin-bottom:5px; font-weight:600;">Rating Bintang:</label>
+                            <select name="rating" required class="form-control-modal" style="width:100%; padding:10px;">
+                                <option value="">Pilih Rating</option>
+                                <option value="5">5 Bintang (Sangat Baik)</option>
+                                <option value="4">4 Bintang (Baik)</option>
+                                <option value="3">3 Bintang (Cukup)</option>
+                                <option value="2">2 Bintang (Kurang)</option>
+                                <option value="1">1 Bintang (Buruk)</option>
+                            </select>
+                        </div>
+                        
+                        <label style="display:block; margin-bottom:5px; font-weight:600;">Komentar:</label>
+                        <textarea name="comment" rows="4" placeholder="Tulis pengalaman Anda menyewa di kos ini..." 
+                                  style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;"></textarea>
+                        
+                        <button type="submit" class="btn btn-primary" style="margin-top:10px;">Kirim Ulasan</button>
+                    </form>
+                <?php else: ?>
+                    <p style="color:var(--text-muted);">Hanya pengguna yang login sebagai **Pencari Kos** yang dapat memberikan ulasan.</p>
+                    <a href="<?= $baseUrl ?>login.php" class="btn btn-login">Login Sekarang</a>
+                <?php endif; ?>
+            </div>
+            <div class="card review-card" style="margin-top:20px;">
+                <h3>⭐ Ulasan Pengguna (<?= $avgRating ?>/5.0)</h3>
+                <p style="color:var(--text-muted);"><?= count($reviews) ?> ulasan total</p>
+                
+                <?php if (!empty($reviews)): ?>
+                    <?php foreach($reviews as $r): ?>
+                        <div class="review-item">
+                            <div class="review-author">
+                                <?= htmlspecialchars($r['fullname']) ?> 
+                                <span style="float:right;">
+                                    <span class="star-rating"><?= str_repeat('★', $r['rating']) ?></span>
+                                    <span class="star-empty"><?= str_repeat('★', 5 - $r['rating']) ?></span>
+                                </span>
+                            </div>
+                            <p style="margin:5px 0;"><?= nl2br(htmlspecialchars($r['comment'])) ?></p>
+                            <div class="review-meta">Tanggal: <?= date('d M Y', strtotime($r['created_at'])) ?></div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p style="text-align:center; color:#999;">Belum ada ulasan untuk kos ini. Jadilah yang pertama!</p>
+                <?php endif; ?>
+            </div>
+            </div>
 
         <aside class="right-col">
             <div class="card">
@@ -239,7 +340,7 @@ $pdo = null;
     <div class="modal-box">
         <div class="modal-header">
             <h4 style="margin:0;">Ajukan Sewa</h4>
-            <button class="close-btn" onclick="closeBooking()">&times;</button>
+            <button class="close-btn" onclick="closeBooking()">×</button>
         </div>
         <form method="post" action="<?= $baseUrl ?>kos/booking.php">
             <div class="modal-body">
