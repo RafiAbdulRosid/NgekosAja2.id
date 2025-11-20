@@ -61,20 +61,102 @@ if (isset($pdo) && $pdo === null) {
     $error = "Terjadi masalah koneksi database.";
 }
 
-include 'includes/header.php'; // Asumsi file ini ada dan memuat Bootstrap/CSS
-?>
+include 'includes/header.php'; ?>
 
-<div class="container my-5" style="max-width:420px;">
-    <div class="card p-4">
-        <h3 class="mb-1" style="color:#00BFA6;">Masuk ke NgekosAja.id</h3>
-        <p class="text-muted mb-3">Masuk sebagai pemilik atau pencari untuk melanjutkan.</p>
+<style>
+body {
+    background: #F6F1EE;
+    font-family: "Poppins", sans-serif;
+}
 
-        <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
+.container-login {
+    max-width: 750px;
+    margin: 40px auto;
+    text-align: center;
+}
+
+/* Judul */
+.login-title {
+    font-size: 42px;
+    font-weight: 600;
+    color: #223A59;
+    margin-bottom: 35px;
+}
+
+/* Card biru */
+.card-login {
+    background: #74B7DB;
+    padding: 50px 60px;
+    border-radius: 30px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    text-align: left;
+}
+
+/* Label */
+.form-label {
+    font-weight: 500;
+    color: #223A59;
+    margin-bottom: 5px;
+}
+
+/* Input style sama dengan register */
+.card-login .form-control {
+    background: rgba(0, 50, 90, 0.35);
+    border: none;
+    height: 48px;
+    color: white;
+    border-radius: 12px;
+    font-size: 16px;
+    padding-left: 15px;
+}
+.card-login .form-control::placeholder {
+    color: rgba(255,255,255,0.7);
+}
+
+/* Tombol */
+.btn-primary {
+    background: white !important;
+    color: #223A59 !important;
+    border: none;
+    border-radius: 14px;
+    font-size: 18px;
+    padding: 12px 0;
+    width: 220px;
+    display: block;
+    margin: 25px auto 0;
+    transition: 0.2s;
+}
+.btn-primary:hover {
+    opacity: 0.85;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 15px;
+    text-align: left;
+}
+
+/* Link Daftar */
+.text-center a {
+    color: #223A59;
+    font-weight: 600;
+}
+</style>
+
+<div class="container-login">
+    <h1 class="login-title">MASUK</h1>
+
+    <div class="card-login">
+
+        <?php if ($error): ?>
+            <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
 
         <form method="post" autocomplete="off">
             <div class="mb-2">
                 <label class="form-label">Email atau Username</label>
-                <input class="form-control" name="identity" value="<?= htmlspecialchars($_POST['identity'] ?? '') ?>" required>
+                <input class="form-control" name="identity"
+                       value="<?= htmlspecialchars($_POST['identity'] ?? '') ?>" required>
             </div>
 
             <div class="mb-3">
@@ -85,8 +167,10 @@ include 'includes/header.php'; // Asumsi file ini ada dan memuat Bootstrap/CSS
             <button class="btn btn-primary w-100" type="submit">Masuk</button>
         </form>
 
-        <p class="mt-3 text-center">Belum punya akun? <a href="register.php">Daftar</a></p>
+        <p class="mt-3 text-center">
+            Belum punya akun? <a href="register.php">Daftar</a>
+        </p>
     </div>
 </div>
 
-<?php include 'includes/footer.php'; // Asumsi file ini ada ?>
+<?php include 'includes/footer.php'; ?>

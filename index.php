@@ -1,506 +1,361 @@
-
 <?php
-
-// index.php - tampilan lebih ceria
-
 session_start();
 
 require_once __DIR__ . '/db.php';
 
+$baseUrl = '/NgekosAja2.id/';
 
-
-$baseUrl = '/NgekosAja.id/'; // sesuaikan jika project di root '/'
-
-
-
-// parameter search & paging sederhana
-
+// parameter search & paging
 $q = trim($_GET['q'] ?? '');
-
 $page = max(1, (int)($_GET['page'] ?? 1));
-
 $perPage = 9;
-
 $offset = ($page - 1) * $perPage;
 
-
-
-// dasar query: hanya kos aktif dan owner terdaftar
-
+// base query (tetap sama)
 $sqlBase = "
-
     FROM kos k
-
     JOIN users u ON u.id = k.owner_id
-
     WHERE 1=1
-
 ";
 
-// Optional: Tambah filter status jika kolom 'status' ada di tabel 'kos'
-
-// $sqlBase .= " AND k.status = 'aktif'";
-
-
-
-// tambah filter pencarian (nama / city)
-
+// search
 $params = [];
-
 if ($q !== '') {
-
     $sqlBase .= " AND (k.name LIKE ? OR k.city LIKE ?)";
-
     $params[] = "%$q%";
-
     $params[] = "%$q%";
-
 }
 
-
-
-// hitung total
-
+// count
 $stmt = $pdo->prepare("SELECT COUNT(*) AS cnt " . $sqlBase);
-
 $stmt->execute($params);
-
 $total = (int)$stmt->fetchColumn();
-
 $pages = max(1, ceil($total / $perPage));
 
-
-
-// ambil data kos beserta satu thumbnail (subquery)
-
+// fetch kos data
 $sqlFetch = "
-
     SELECT k.id, k.name, k.city, k.price, k.type, u.fullname AS owner_name,
-
       (SELECT filename FROM kos_images WHERE kos_images.kos_id = k.id ORDER BY id ASC LIMIT 1) AS thumb
-
-    " . $sqlBase . "
-
+    $sqlBase
     ORDER BY k.created_at DESC
-
     LIMIT $perPage OFFSET $offset
-
 ";
-
 $stmt = $pdo->prepare($sqlFetch);
-
 $stmt->execute($params);
-
 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
-
-$pdo = null; // Tutup koneksi
-
+$pdo = null;
 ?>
-
 <!doctype html>
-
 <html lang="id">
-
 <head>
-
     <meta charset="utf-8">
-
     <meta name="viewport" content="width=device-width,initial-scale=1">
-
     <title>NgekosAja.id — Cari Kos Terbaik</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet">
-
-    <style>
-
-        /* CSS Variabel & Reset */
-
-        :root{
-
-            --primary:#00BFA6; /* Hijau Toska */
-
-            --secondary:#FF8A65; /* Oranye */
-
-            --light:#FFFFFF; /* Putih Cerah */
-
-            --bg-light:#F4F8F9; /* Background Super Light Blue */
-
-            --dark:#263238;
-
-            --text-muted:#607D8B;
-
-        }
-
-        *{box-sizing:border-box}
-
-        body{font-family:'Nunito Sans',sans-serif;margin:0;background:var(--bg-light);color:var(--dark)}
-
-       
-
-        /* Layout */
-
-        .wrap{max-width:1200px;margin:0 auto;padding:0 20px}
-
-        header{background:var(--light);box-shadow:0 2px 4px rgba(0,0,0,0.05);position:sticky;top:0;z-index:100}
-
-        .navbar{display:flex;justify-content:space-between;align-items:center;padding:12px 0}
-
-        .logo{font-family:'Poppins',sans-serif;font-weight:700;font-size:24px;color:var(--primary);text-decoration:none}
-
-       
-
-        /* Hero Section */
-
-        .hero{
-
-            background: linear-gradient(135deg, #00BFA6, #33C7B5);
-
-            padding:60px 50px;
-
-            border-radius:20px;
-
-            color:var(--light);
-
-            text-align:center;
-
-            margin-top:25px;
-
-            box-shadow: 0 15px 30px rgba(0, 191, 166, 0.2);
-
-        }
-
-        .hero h2{font-family:'Poppins',sans-serif;margin:0 0 10px;font-size:36px;text-shadow: 1px 1px 2px rgba(0,0,0,0.1);}
-
-        .hero p{margin:0 0 25px;font-size:18px;opacity:.95}
-
-
-
-        /* Search Form */
-
-        .search-form{display:flex;justify-content:center;gap:12px;max-width:700px;margin:0 auto}
-
-        .search-input{
-
-            flex:1;
-
-            padding:14px 20px;
-
-            border-radius:12px;
-
-            border:none;
-
-            font-size:16px;
-
-            box-shadow:0 6px 15px rgba(0,0,0,0.1);
-
-            transition: box-shadow .3s;
-
-        }
-
-        .search-input:focus {
-
-            box-shadow: 0 0 0 3px var(--secondary);
-
-            outline: none;
-
-        }
-
-       
-
-        /* Buttons */
-
-        .btn{padding:14px 25px;border-radius:12px;text-decoration:none;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;}
-
-        .btn-primary{background:var(--secondary);color:#fff;border:none}
-
-        .btn-primary:hover{background:#FF7043;box-shadow:0 4px 10px rgba(255, 138, 101, 0.4);}
-
-        .btn-link{color:var(--primary);text-decoration:none;font-weight:600}
-
-        .btn-link:hover{text-decoration:underline}
-
-       
-
-        /* Kos Grid & Card */
-
-        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:25px;margin-top:35px}
-
-        .card-kos{
-
-            background:var(--light);
-
-            border-radius:15px;
-
-            overflow:hidden;
-
-            box-shadow:0 8px 25px rgba(0,0,0,0.08);
-
-            transition:transform .3s, box-shadow .3s;
-
-            border: 1px solid #eee;
-
-        }
-
-        .card-kos:hover{transform:translateY(-7px);box-shadow:0 18px 40px rgba(0,0,0,0.15);}
-
-        .card-kos a{text-decoration:none;color:inherit}
-
-        .card-kos img{width:100%;height:200px;object-fit:cover;transition:transform .5s}
-
-        .card-kos:hover img{transform:scale(1.05)}
-
-        .card-body{padding:18px}
-
-        .card-title{font-family:'Poppins',sans-serif;font-weight:700;font-size:19px;margin-bottom:4px;color:var(--dark)}
-
-        .card-meta{color:var(--text-muted);font-size:14px;margin-bottom:8px}
-
-        .card-owner{color:var(--primary);font-size:12px;margin-top:4px;font-weight:600}
-
-        .price{font-weight:700;font-size:24px;color:#388E3C;margin-top:8px}
-
-       
-
-        /* Paging */
-
-        .pager{margin:40px 0;display:flex;gap:15px;justify-content:center}
-
-        .pager .btn-page{
-
-            padding:10px 18px;
-
-            border-radius:10px;
-
-            border:1px solid var(--primary);
-
-            color:var(--primary);
-
-            text-decoration:none;
-
-            font-weight:600;
-
-            transition:background-color .2s;
-
-        }
-
-        .pager .btn-page:hover{background:var(--primary);color:#fff}
-
-        .pager .current{align-self:center;color:var(--text-muted);font-weight:600}
-
-
-
-        /* FOOTER STYLE */
-
-        footer{
-
-            background:var(--light);
-
-            padding:30px 0;
-
-            margin-top:50px;
-
-            border-top:1px solid #eee;
-
-            color:var(--text-muted);
-
-            text-align:center;
-
-            font-size:14px;
-
-        }
-
-        footer .logo{font-size:20px;}
-
-    </style>
-
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --blue: #71B6D5;
+    --cream: #FAF7F4;
+    --dark: #1E1E1E;
+    --text: #4A4A4A;
+}
+
+/* RESET */
+body {
+    margin:0;
+    font-family:'Nunito Sans', sans-serif;
+    background:#FFFFFF;
+    color:var(--dark);
+}
+
+/* NAVBAR */
+header {
+    background: var(--blue);
+    padding: 15px 0;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+}
+.navbar {
+    max-width: 1200px;
+    margin:auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+.logo img {
+    max-height:50px;
+}
+.nav-links a {
+    font-weight:600;
+    text-decoration:none;
+    margin-left:15px;
+}
+
+.btn-outline {
+    padding:8px 20px;
+    border-radius:10px;
+    border:2px solid #fff;
+    background:transparent;
+    color:#fff;
+}
+
+.btn-white {
+    padding:8px 20px;
+    border-radius:10px;
+    background:#fff;
+    color:#000;
+    font-weight:600;
+}
+
+/* HERO */
+.hero {
+    width:100%;
+    height:380px;
+    background:url('https://www.gordenjogja.co.id/wp-content/uploads/2021/12/desain-kamar-kost-2.jpg') center/cover no-repeat;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+}
+
+.hero::after {
+    content:'';
+    position:absolute;
+    inset:0;
+    background:rgba(0, 0, 0, 0.16);
+}
+
+.hero-content {
+    position:relative;
+    z-index:3;
+    text-align:center;
+    color:#fff;
+    max-width:650px;
+}
+
+.hero-content h2 {
+    font-size:42px;
+    font-weight:700;
+    font-family:'Poppins';
+    line-height:1.2;
+    margin-bottom:20px;
+}
+
+/* SEARCH */
+.search-box {
+    background:#fff;
+    width:600px;
+    padding:15px 20px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    margin:20px auto 0;
+    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+}
+.search-box input {
+    flex:1;
+    padding:8px;
+    border:none;
+    font-size:16px;
+}
+.search-box button {
+    background:#4aa3c7;
+    border:none;
+    padding:10px 20px;
+    border-radius:10px;
+    color:#fff;
+    font-weight:600;
+}
+
+/* GRID */
+.grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
+    gap:30px;
+}
+.card-kos {
+    border-radius:16px;
+    background:#fff;
+    overflow:hidden;
+    border:1px solid #eee;
+    box-shadow:0 6px 15px rgba(0,0,0,0.08);
+    transition:0.3s;
+}
+.card-kos:hover {
+    transform:translateY(-6px);
+    box-shadow:0 20px 40px rgba(0,0,0,0.12);
+}
+.card-kos img {
+    width:100%;
+    height:200px;
+    object-fit:cover;
+}
+.card-body {
+    padding:18px;
+}
+.card-title {
+    font-family:'Poppins';
+    font-size:20px;
+    font-weight:700;
+}
+.card-meta {
+    color:#666;
+    font-size:14px;
+}
+.price {
+    margin-top:8px;
+    font-size:22px;
+    font-weight:700;
+    color:#2E7D32;
+}
+
+/* FOOTER */
+footer {
+    background:var(--blue);
+    text-align:center;
+    color:#fff;
+    padding:30px 0;
+    margin-top:50px;
+}
+.footer-logo {
+    font-size:22px;
+    font-family:'Poppins';
+    font-weight:700;
+    margin-bottom:5px;
+}
+.footer-sub {
+    margin-bottom:10px;
+    opacity:0.9;
+}
+</style>
 </head>
 
 <body>
 
-    <header>
-
-        <div class="wrap navbar">
-
-            <a href="<?= $baseUrl ?>index.php" class="logo">NgekosAja.id</a>
-
-            <div class="nav-links">
-
-                <?php if(!empty($_SESSION['user_id'])): ?>
-
-                    Halo, <b><?= htmlspecialchars($_SESSION['fullname'] ?? $_SESSION['username']) ?></b> |
-
-                    <a href="<?= $baseUrl . (($_SESSION['role'] ?? '') === 'pemilik' ? 'dashboard_owner.php' : 'dashboard_user.php') ?>" class="btn-link">Dashboard</a> |
-
-                    <a href="<?= $baseUrl ?>logout.php" class="btn-link">Logout</a>
-
-                <?php else: ?>
-
-                    <a href="<?= $baseUrl ?>login.php" class="btn-link">Login</a>
-
-                    <a href="<?= $baseUrl ?>register.php" class="btn-primary btn" style="margin-left:15px; padding: 10px 18px;">Daftar</a>
-
-                <?php endif; ?>
-
-            </div>
-
+<!-- HEADER BARU -->
+<header>
+    <div class="navbar">
+        <a href="<?= $baseUrl ?>index.php" class="logo">
+            <img src="<?= $baseUrl ?>assets/uploads/logo.png" alt="NgekosAja.id">
+        </a>
+        <div class="nav-links">
+        <?php if(!empty($_SESSION['user_id'])): ?> Halo, <b><?= htmlspecialchars($_SESSION['fullname'] ?? $_SESSION['username']) ?></b>      
+            <a href="<?= $baseUrl . (($_SESSION['role'] ?? '') === 'pemilik' ? 'dashboard_owner.php' : 'dashboard_user.php') ?>" class="btn-outline">Dashboard</a>  
+            <a href="<?= $baseUrl ?>logout.php" class="btn-outline">Logout</a> <?php else: ?> <a href="<?= $baseUrl ?>login.php" class="btn-outline">Login</a> 
+            <a href="<?= $baseUrl ?>register.php" class="btn-white" >Daftar</a> <?php endif; ?>
         </div>
-
-    </header>
-
-
-
-    <div class="wrap">
-
-        <section class="hero">
-
-            <h2>🏠 Temukan Hunian Idealmu dengan Mudah</h2>
-
-            <p>Jelajahi ribuan pilihan kos tepercaya yang ditambahkan langsung oleh pemilik.</p>
-
-
-
-            <form method="get" class="search-form">
-
-                <input class="search-input" name="q" placeholder="Cari nama kos atau kota (e.g. 'Putra' atau 'Semarang')..." value="<?= htmlspecialchars($q) ?>">
-
-                <button class="btn btn-primary" type="submit">Cari</button>
-
-            </form>
-
-        </section>
-
-
-
-        <main style="margin-top:45px">
-
-            <h3 style="font-family:'Poppins',sans-serif;margin-bottom:15px;color:var(--dark);">
-
-                Daftar Kos Tersedia
-
-            </h3>
-
-           
-
-            <?php if (empty($rows)): ?>
-
-              <div class="card-kos" style="padding:40px;text-align:center;box-shadow:none;border:2px dashed #ccc;">
-
-                <h4 style="color:var(--secondary)">😔 Kos Tidak Ditemukan</h4>
-
-                <p style="font-size:16px;">Coba kata kunci lain atau <a href="<?= $baseUrl ?>index.php" class="btn-link">Lihat Semua Kos</a>.</p>
-
-              </div>
-
-            <?php else: ?>
-
-                <div class="grid">
-
-                    <?php foreach($rows as $r):
-
-                        // tentukan URL thumbnail
-
-                        if (!empty($r['thumb'])) {
-
-                            $thumb = $baseUrl . ltrim($r['thumb'],'/');
-
-                        } else {
-
-                            $thumb = "https://picsum.photos/seed/kos{$r['id']}/400/300";
-
-                        }
-
-                    ?>
-
-                      <div class="card-kos">
-
-                        <a href="<?= $baseUrl ?>kos/detail.php?id=<?= (int)$r['id'] ?>">
-
-                          <img src="<?= htmlspecialchars($thumb) ?>" alt="<?= htmlspecialchars($r['name']) ?>">
-
-                          <div class="card-body">
-
-                            <h4 class="card-title"><?= htmlspecialchars($r['name']) ?></h4>
-
-                            <div class="card-meta">
-
-                                <?= htmlspecialchars($r['city']) ?> • Tipe: <?= htmlspecialchars($r['type']) ?>
-
-                                <div class="card-owner">Oleh: <?= htmlspecialchars($r['owner_name'] ?? 'Anonim') ?></div>
-
-                            </div>
-
-                            <div class="price">Rp <?= number_format($r['price'],0,',','.') ?> <span style="font-size:16px;font-weight:400;color:var(--text-muted)">/ bulan</span></div>
-
-                          </div>
-
-                        </a>
-
-                      </div>
-
-                    <?php endforeach; ?>
-
-                </div>
-
-            <?php endif; ?>
-
-
-
-            <?php if ($pages > 1): ?>
-
-                <div class="pager" aria-label="pagination">
-
-                    <?php if ($page>1): ?>
-
-                        <a class="btn-page" href="?<?= http_build_query(['q'=>$q,'page'=>$page-1]) ?>">&larr; Sebelumnya</a>
-
-                    <?php endif; ?>
-
-                    <div class="current">Halaman <?= $page ?> dari <?= $pages ?></div>
-
-                    <?php if ($page < $pages): ?>
-
-                        <a class="btn-page" href="?<?= http_build_query(['q'=>$q,'page'=>$page+1]) ?>">Selanjutnya &rarr;</a>
-
-                    <?php endif; ?>
-
-                </div>
-
-            <?php endif; ?>
-
-        </main>
-
+    </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+    <div class="hero-content">
+        <h2>Temukan kost terbaik dekat kampusmu!</h2>
+
+        <form method="get" class="search-box">
+            <input name="q" value="<?= htmlspecialchars($q) ?>" placeholder="Cari kos atau kota...">
+            <button type="submit">Cari</button>
+        </form>
+    </div>
+</div>
+
+<!-- LIST KOS -->
+<div class="kos-section" style="max-width:1200px;margin:50px auto;">
+
+<?php if (empty($rows)): ?>
+
+    <div class="card-kos" style="
+        padding:40px;
+        text-align:center;
+        box-shadow:none;
+        border:2px dashed #ccc;
+        border-radius:16px;
+        background:#fff;
+    ">
+        <h3 style="color:#4aa3c7;margin-bottom:10px;">Kos Tidak Ditemukan</h3>
+        <p style="font-size:16px;color:#555;">
+            Coba kata kunci lain atau 
+            <a href="<?= $baseUrl ?>index.php" style="color:#4aa3c7;font-weight:600;text-decoration:none;">
+                Lihat Semua Kos
+            </a>.
+        </p>
     </div>
 
-   
+<?php else: ?>
 
-    <footer>
+    <div class="grid">
+        <?php foreach($rows as $r):
 
-        <div class="wrap">
+            $thumb = !empty($r['thumb'])
+                ? $baseUrl . ltrim($r['thumb'],'/')
+                : "https://picsum.photos/seed/kos{$r['id']}/400/300";
+        ?>
+        <div class="card-kos">
+            <a href="<?= $baseUrl ?>kos/detail.php?id=<?= (int)$r['id'] ?>" style="text-decoration:none;color:inherit;">
+                <img src="<?= htmlspecialchars($thumb) ?>" alt="<?= htmlspecialchars($r['name']) ?>">
+                <div class="card-body">
+                    <div class="card-title"><?= htmlspecialchars($r['name']) ?></div>
 
-            <div style="font-weight:700;margin-bottom:5px;">
+                    <div class="card-meta">
+                        <?= htmlspecialchars($r['city']) ?> • Tipe: <?= htmlspecialchars($r['type']) ?>
+                        <div style="font-size:13px;margin-top:4px;color:#777;">
+                            Oleh: <?= htmlspecialchars($r['owner_name'] ?? 'Anonim') ?>
+                        </div>
+                    </div>
 
-                <a href="<?= $baseUrl ?>index.php" class="logo">NgekosAja.id</a>
+                    <div class="price">
+                        Rp <?= number_format($r['price'],0,',','.') ?>
+                        <span style="font-size:14px;font-weight:400;color:#666;">/ bulan</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <?php endforeach; ?>
+    </div>
 
-            </div>
+<?php endif; ?>
 
-            <p style="margin:5px 0 0;font-size:15px;">Temukan kos terbaikmu di sini. Cepat, Mudah, dan Langsung dari Pemilik.</p>
+<!-- PAGINATION -->
+<?php if ($pages > 1): ?>
+    <div style="text-align:center;margin-top:30px;display:flex;justify-content:center;gap:20px;align-items:center;">
 
-            <p style="margin-top:10px;font-size:13px;">&copy; <?= date('Y') ?> NgekosAja.id. All rights reserved.</p>
+        <?php if ($page > 1): ?>
+            <a href="?<?= http_build_query(['q'=>$q,'page'=>$page-1]) ?>"
+               style="padding:10px 18px;border-radius:10px;background:#4aa3c7;color:#fff;text-decoration:none;">
+               &larr; Sebelumnya
+            </a>
+        <?php endif; ?>
 
-            <div style="margin-top:10px;font-size:13px;">
-
-                <a href="#" class="btn-link" style="margin:0 8px;">Kebijakan Privasi</a> |
-
-                <a href="#" class="btn-link" style="margin:0 8px;">Kontak Kami</a>
-
-            </div>
-
+        <div style="font-weight:600;color:#333;">
+            Halaman <?= $page ?> dari <?= $pages ?>
         </div>
 
-    </footer>
+        <?php if ($page < $pages): ?>
+            <a href="?<?= http_build_query(['q'=>$q,'page'=>$page+1]) ?>"
+               style="padding:10px 18px;border-radius:10px;background:#4aa3c7;color:#fff;text-decoration:none;">
+               Selanjutnya &rarr;
+            </a>
+        <?php endif; ?>
 
-    </body>
+    </div>
+<?php endif; ?>
 
+</div>
+
+<!-- FOOTER BARU -->
+<footer>
+    <div class="footer-wrap">
+        <div class="footer-logo">NgekosAja.id</div>
+        <div class="footer-sub">the easiest way to find your place</div>
+    </div>
+    © <?= date('Y') ?> NgekosAja.id — All rights reserved.
+     <div style="margin-top:10px;font-size:13px;">
+        <a href="#" style="color:white;text-decoration:none;margin:0 8px;">Kebijakan Privasi</a> |
+        <a href="#" style="color:white;text-decoration:none;margin:0 8px;">Kontak Kami</a>
+    </div>
+</footer>
+
+</body>
 </html>

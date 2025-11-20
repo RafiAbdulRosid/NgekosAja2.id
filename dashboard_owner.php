@@ -14,7 +14,7 @@ $owner_id = (int)$_SESSION['user_id'];
 // Ambil nama pemilik untuk ditampilkan
 $owner_fullname = $_SESSION['fullname'] ?? $_SESSION['username'] ?? 'Pemilik Kos'; 
 
-$baseUrl = '/NgekosAja.id/'; // sesuaikan jika project bukan di subfolder
+$baseUrl = '/NgekosAja2.id/'; // sesuaikan jika project bukan di subfolder
 
 // Tangani delete (opsional)
 $messages = [];

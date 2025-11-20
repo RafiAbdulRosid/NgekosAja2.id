@@ -4,19 +4,92 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>NgekosAja.id</title>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/NgekosAja.id/assets/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/NgekosAja2.id/assets/css/style.css">
+
+  <style>
+    /* ====== NAVBAR CUSTOM (MENYESUAIKAN STYLE REFERENSI) ====== */
+
+    header {
+        background: #71B6D5;
+        padding: 15px 0;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+    }
+
+    .navbar-custom {
+        max-width: 1200px;
+        margin: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* LOGO GAMBAR */
+    .logo-img {
+        max-height: 48px;
+        width: auto;
+        display: block;
+    }
+
+    /* Tombol login & daftar mengikuti style referensi */
+    .btn-outline-custom {
+        padding: 8px 18px;
+        border-radius: 10px;
+        border: 2px solid #fff;
+        background: transparent;
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+
+    .btn-white-custom {
+        padding: 8px 18px;
+        border-radius: 10px;
+        background: #fff;
+        color: #000;
+        text-decoration: none;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+
+    /* Untuk user login */
+    .nav-hello {
+        color: #fff;
+        margin-right: 10px;
+        font-weight: 600;
+    }
+  </style>
 </head>
+
 <body>
-<nav class="navbar navbar-expand-lg navbar-light shadow-sm bg-white">
-  <div class="container">
-    <a class="navbar-brand fw-bold text-primary" href="/NgekosAja.id/index.php">
-      <span style="color:#00BFA6;">Ngekos</span><span style="color:#FF8A65;">Aja.id</span>
-    </a>
-    <div>
-      <a href="/NgekosAja.id/register.php" class="btn btn-outline-primary me-2">Daftar</a>
-      <a href="/NgekosAja.id/login.php" class="btn btn-primary">Login</a>
-    </div>
+
+<header>
+  <div class="navbar-custom">
+
+      <!-- LOGO (gunakan gambar bila tersedia) -->
+      <a href="<?= $baseUrl ?>index.php" class="logo">
+    <img src="/NgekosAja2.id/assets/uploads/logo.png" alt="logo" style="max-height: 48px">
+</a>
+
+
+
+      <div class="nav-links d-flex align-items-center">
+
+      <?php if (!empty($_SESSION['user_id'])): ?>
+          <span class="nav-hello">Halo, <b><?= htmlspecialchars($_SESSION['fullname']) ?></b></span>
+          <a href="/NgekosAja2.id/logout.php" class="btn-outline-custom">Logout</a>
+
+      <?php else: ?>
+          <a href="/NgekosAja2.id/login.php" class="btn-outline-custom">Login</a>
+          <a href="/NgekosAja2.id/register.php" class="btn-white-custom">Daftar</a>
+
+      <?php endif; ?>
+
+      </div>
+
   </div>
-</nav>
+</header>

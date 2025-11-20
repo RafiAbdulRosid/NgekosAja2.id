@@ -42,11 +42,97 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <?php include 'includes/header.php'; ?>
+<style>
+body {
+    background: #F6F1EE;
+    font-family: "Poppins", sans-serif;
+}
 
-<div class="container my-5" style="max-width:520px;">
-  <div class="card p-4">
-    <h3 class="mb-2" style="color:#00BFA6;">Daftar Akun</h3>
-    <p class="text-muted mb-3">Buat akun pemilik kos atau pencari (mahasiswa).</p>
+.container-register {
+    max-width: 750px;
+    margin: 40px auto;
+    text-align: center;
+}
+
+/* Judul */
+.register-title {
+    font-size: 42px;
+    font-weight: 600;
+    color: #223A59;
+    margin-bottom: 35px;
+}
+
+/* Card biru */
+.card-register {
+    background: #74B7DB;
+    padding: 50px 60px;
+    border-radius: 30px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    text-align: left;
+}
+
+/* Label tetap ada tapi disembunyikan secara visual */
+.form-label {
+    font-weight: 500;
+    color: #223A59;
+    margin-bottom: 5px;
+}
+
+/* Input */
+.card-register .form-control,
+.card-register .form-select {
+    background: rgba(0, 50, 90, 0.35);
+    border: none;
+    height: 48px;
+    color: white;
+    border-radius: 12px;
+    font-size: 16px;
+    padding-left: 15px;
+}
+
+.card-register .form-control::placeholder {
+    color: rgba(255,255,255,0.7);
+}
+
+.form-text {
+    color: #335;
+}
+
+/* Tombol daftar */
+.btn-primary {
+    background: white !important;
+    color: #223A59 !important;
+    border: none;
+    border-radius: 14px;
+    font-size: 18px;
+    padding: 12px 0;
+    width: 220px;
+    display: block;
+    margin: 25px auto 0;
+    transition: 0.2s;
+}
+
+.btn-primary:hover {
+    opacity: 0.85;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 15px;
+    text-align: left;
+}
+
+/* Link Masuk */
+.text-center a {
+    color: #223A59;
+    font-weight: 600;
+}
+</style>
+
+<div class="container-register">
+    <h1 class="register-title">DAFTAR</h1>
+
+    <div class="card-register">
 
     <?php if ($success): ?>
       <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>

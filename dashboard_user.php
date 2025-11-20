@@ -6,7 +6,7 @@
 session_start();
 require_once __DIR__ . '/db.php';
 
-$baseUrl = '/NgekosAja.id/'; // ubah menjadi '/' jika project langsung di htdocs
+$baseUrl = '/NgekosAja2.id/'; // ubah menjadi '/' jika project langsung di htdocs
 
 // Cek autentikasi & role
 if (empty($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'pencari') {
