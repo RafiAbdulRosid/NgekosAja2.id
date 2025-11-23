@@ -1,20 +1,20 @@
 body {
-  font-family: 'Inter', sans-serif;
-  background-color: #FAFAFA;
-  color: #263238;
+  font-family:'Nunito Sans', sans-serif;
+  background-color: #F5efeb;
+  color: #2d424d;
 }
 
 h1, h2, h3, h4, h5, h6, .navbar-brand {
-  font-family: 'Poppins', sans-serif;
+  font-family:'Nunito Sans', sans-serif;
 }
 
 .btn-primary {
-  background-color: #FF8A65;
+  background-color: #2d424d;
   border: none;
 }
 .btn-primary:hover {
-  background-color: #FFD54F;
-  color: #263238;
+  background-color: #2d424d;
+  color: #ffffff;
 }
 
 .card {
@@ -24,7 +24,7 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
 }
 
 .hero {
-  background: linear-gradient(120deg,#00BFA6,#A5D6A7);
+  background: linear-gradient(120deg,#567c8d,#6994a9);
   color: white;
   padding: 4rem 0;
   border-radius: 0 0 2rem 2rem;

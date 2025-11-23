@@ -65,8 +65,8 @@ include 'includes/header.php'; ?>
 
 <style>
 body {
-    background: #F6F1EE;
-    font-family: "Poppins", sans-serif;
+    background: #F5efeb;
+    font-family:'Nunito Sans', sans-serif 
 }
 
 .container-login {
@@ -77,6 +77,7 @@ body {
 
 /* Judul */
 .login-title {
+    font-family:'Nunito Sans', sans-serif
     font-size: 42px;
     font-weight: 600;
     color: #223A59;

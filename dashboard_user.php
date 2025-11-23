@@ -72,7 +72,9 @@ try {
 }
 
 // (opsional) tutup koneksi di sini jika ingin
-// $pdo = null;
+$pdo = null; // Tutup koneksi
+// include header jika ada (opsional)
+if (file_exists(__DIR__ . '/includes/header.php')) include __DIR__ . '/includes/header.php';
 ?>
 <!doctype html>
 <html lang="id">
@@ -96,9 +98,9 @@ try {
         .wrap{max-width:1100px;margin:0 auto;padding:0 20px}
 
 /* Header */
-header{background:var(--light);box-shadow:0 2px 6px rgba(0,0,0,0.05);padding:15px 0;margin-bottom:30px;}
+header{background:#567c8d;box-shadow:0 2px 6px rgba(0,0,0,0.05);padding:15px 0;margin-bottom:30px;}
 .navbar{display:flex;justify-content:space-between;align-items:center;}
-.logo{font-family:'Poppins',sans-serif;font-weight:700;font-size:22px;color:var(--primary);text-decoration:none}
+.logo{font-family:'Nunito Sans',sans-serif;font-weight:700;font-size:22px;color:var(--primary);text-decoration:none}
 
 /* Buttons */
 .btn{padding:10px 18px;border-radius:10px;text-decoration:none;font-weight:600;cursor:pointer;transition:all .2s;border:none;display:inline-block;}
@@ -113,17 +115,17 @@ header{background:var(--light);box-shadow:0 2px 6px rgba(0,0,0,0.05);padding:15p
 .profile-icon:hover { border-color: var(--secondary); }
 .dropdown-content { display: none; position: absolute; right: 0; background-color: var(--light); min-width: 200px; box-shadow: 0 8px 16px rgba(0,0,0,0.12); z-index: 1000; border-radius: 8px; overflow: hidden; margin-top:10px; }
 .dropdown-content a { color: var(--dark); padding: 12px 14px; text-decoration:none; display:block; font-weight:600; }
-.dropdown-content a:hover { background: #f6f8f9; }
+.dropdown-content a:hover { background: #c0bfbdff; }
 .info-display { padding: 10px 14px; border-bottom:1px solid #eee; background:#fafafa; font-size:14px; }
 
 /* Cards */
-.card{background:var(--light);border-radius:15px;padding:25px;box-shadow:0 4px 15px rgba(0,0,0,0.05);margin-bottom:20px;}
-.card h3{margin-top:0;font-family:'Poppins',sans-serif;color:var(--dark);}
+.card{background: #cdc9c1ff;border-radius:15px;padding:25px;box-shadow:0 4px 15px rgba(0,0,0,0.05);margin-bottom:20px;}
+.card h3{margin-top:0;font-family:'Nunito Sans',sans-serif;color:var(--dark);}
 
 /* Welcome Box */
 .welcome-box{
-    background: linear-gradient(135deg, var(--primary), #009688);
-    color: #fff; border-radius: 15px; padding: 30px; margin-bottom: 30px;
+    background: linear-gradient(135deg, #cdc9c1ff, #9e9a92ed);
+    color: #3d4854ff; border-radius: 15px; padding: 30px; margin-bottom: 30px;
     display: flex; justify-content: space-between; align-items: center;
     box-shadow: 0 10px 20px rgba(0, 191, 166, 0.12);
 }
@@ -134,9 +136,9 @@ header{background:var(--light);box-shadow:0 2px 6px rgba(0,0,0,0.05);padding:15p
 .empty-state p{color:var(--text-muted);margin-bottom:20px;}
 
 /* LIST BOOKING */
-.booking-item { display:flex; justify-content:space-between; align-items:center; padding:18px; border:1px solid #f1f1f1; border-radius:12px; margin-bottom:14px; background:#fff; transition: transform .15s; }
+.booking-item { display:flex; justify-content:space-between; align-items:center; padding:18px; border:1px solid #f1f1f1ff; border-radius:12px; margin-bottom:14px; background: #ffffffff; transition: transform .15s; }
 .booking-item:hover { transform:translateY(-3px); box-shadow:0 6px 18px rgba(0,0,0,0.05); border-color: #e6f5ef; }
-.b-info h4 { margin:0 0 6px; font-family: 'Poppins', sans-serif; font-size:18px; }
+.b-info h4 { margin:0 0 6px; font-family: 'Nunito Sans', sans-serif; font-size:18px; }
 .b-meta { color:var(--text-muted); font-size:14px; }
 .b-date { margin-top:8px; font-weight:600; color:var(--dark); font-size:14px; }
 
@@ -154,43 +156,6 @@ header{background:var(--light);box-shadow:0 2px 6px rgba(0,0,0,0.05);padding:15p
 </head>
 <body>
 
-<header>
-    <div class="wrap navbar">
-        <a href="<?= htmlspecialchars($baseUrl) ?>index.php" class="logo">NgekosAja.id</a>
-
-        <div style="display:flex;align-items:center;gap:12px;">
-            <!-- Form pencarian: submit ke index.php -->
-            <form action="<?= htmlspecialchars($baseUrl) ?>index.php" method="get" style="display:flex; align-items:center; gap:8px;">
-                <input name="q" type="search" placeholder="Cari kos atau lokasi..." aria-label="Cari kos"
-                    style="padding:8px 12px;border-radius:999px;border:1px solid #eee;min-width:220px;font-weight:600">
-                <button type="submit" class="btn btn-primary">🔍 Cari</button>
-            </form>
-
-            <!-- Beranda cepat -->
-            <a href="<?= htmlspecialchars($baseUrl) ?>index.php" class="btn btn-outline">Beranda</a>
-
-            <!-- profil dropdown -->
-            <?php if ($user_data): ?>
-                <div class="profile-menu-container">
-                    <img src="<?= htmlspecialchars($profileImageUrl) ?>" alt="Profil" class="profile-icon" id="profileIcon"
-                         onclick="toggleProfileDropdown()">
-                    <div id="profileDropdown" class="dropdown-content" aria-hidden="true">
-                        <div class="info-display">
-                            <?= htmlspecialchars($user_data['fullname'] ?? $fullname) ?><br>
-                            <small style="color:var(--text-muted)">@<?= htmlspecialchars($user_data['username'] ?? '') ?></small>
-                        </div>
-                        <a href="<?= htmlspecialchars($baseUrl) ?>profile.php">Pengaturan Akun</a>
-                        <a href="<?= htmlspecialchars($baseUrl) ?>dashboard_user.php">Dashboard Saya</a>
-                        <a href="<?= htmlspecialchars($baseUrl) ?>logout.php">Logout</a>
-                    </div>
-                </div>
-            <?php else: ?>
-                <a href="<?= htmlspecialchars($baseUrl) ?>login.php" class="btn btn-outline">Login</a>
-            <?php endif; ?>
-        </div>
-    </div>
-</header>
-
 <div class="wrap">
     <div class="welcome-box">
         <div class="welcome-text">
@@ -198,7 +163,7 @@ header{background:var(--light);box-shadow:0 2px 6px rgba(0,0,0,0.05);padding:15p
             <p style="margin:6px 0 0">Pantau status pengajuan sewa kosmu di sini.</p>
         </div>
         <div>
-            <a href="<?= htmlspecialchars($baseUrl) ?>index.php?focus=search" class="btn btn-primary" style="background:#FF8A65;">🔎 Cari Kos</a>
+            <a href="<?= htmlspecialchars($baseUrl) ?>index.php?focus=search" class="btn btn-primary" style="background: #768399df;">🔎 Cari Kos</a>
         </div>
     </div>
 

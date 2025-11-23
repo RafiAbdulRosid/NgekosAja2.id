@@ -14,7 +14,7 @@
     /* ====== NAVBAR CUSTOM (MENYESUAIKAN STYLE REFERENSI) ====== */
 
     header {
-        background: #71B6D5;
+        background: #567c8d;
         padding: 15px 0;
         box-shadow: 0 3px 6px rgba(0,0,0,0.08);
     }
@@ -38,9 +38,9 @@
     .btn-outline-custom {
         padding: 8px 18px;
         border-radius: 10px;
-        border: 2px solid #fff;
+        border: 2px solid #ffffffe1;
         background: transparent;
-        color: #fff;
+        color: #ffffffc5;
         text-decoration: none;
         font-weight: 600;
         margin-left: 10px;
@@ -49,7 +49,7 @@
     .btn-white-custom {
         padding: 8px 18px;
         border-radius: 10px;
-        background: #fff;
+        background: #fffffff5;
         color: #000;
         text-decoration: none;
         font-weight: 600;
@@ -72,7 +72,7 @@
 
       <!-- LOGO (gunakan gambar bila tersedia) -->
       <a href="<?= $baseUrl ?>index.php" class="logo">
-    <img src="/NgekosAja2.id/assets/uploads/logo.png" alt="logo" style="max-height: 48px">
+    <img src="/NgekosAja2.id/assets/uploads/logo.png" alt="NgekosAja2.id" style="max-height: 48px">
 </a>
 
 
@@ -84,7 +84,7 @@
           <a href="/NgekosAja2.id/logout.php" class="btn-outline-custom">Logout</a>
 
       <?php else: ?>
-          <a href="/NgekosAja2.id/login.php" class="btn-outline-custom">Login</a>
+          <a href="/NgekosAja2.id/login.php" class="btn-outline-custom">Masuk</a>
           <a href="/NgekosAja2.id/register.php" class="btn-white-custom">Daftar</a>
 
       <?php endif; ?>

@@ -21,7 +21,12 @@ $sqlBase = "
 // search
 $params = [];
 if ($q !== '') {
-    $sqlBase .= " AND (k.name LIKE ? OR k.city LIKE ?)";
+    $sqlBase .= " AND (k.name LIKE ? 
+                   OR k.city LIKE ? 
+                   OR k.address LIKE ? 
+                   OR k.type LIKE ?)";
+    $params[] = "%$q%";
+    $params[] = "%$q%";
     $params[] = "%$q%";
     $params[] = "%$q%";
 }
@@ -57,8 +62,8 @@ $pdo = null;
 
 <style>
 :root {
-    --blue: #71B6D5;
-    --cream: #FAF7F4;
+    --blue: #567C8D;
+    --cream: #F5EFEB;
     --dark: #1E1E1E;
     --text: #4A4A4A;
 }
@@ -67,7 +72,7 @@ $pdo = null;
 body {
     margin:0;
     font-family:'Nunito Sans', sans-serif;
-    background:#FFFFFF;
+    background:#F5EFEB;
     color:var(--dark);
 }
 
@@ -96,15 +101,15 @@ header {
 .btn-outline {
     padding:8px 20px;
     border-radius:10px;
-    border:2px solid #fff;
+    border:2px solid #ffffffc4;
     background:transparent;
-    color:#fff;
+    color: #ffffff;
 }
 
 .btn-white {
     padding:8px 20px;
     border-radius:10px;
-    background:#fff;
+    background: #ffffffc4;
     color:#000;
     font-weight:600;
 }
@@ -113,7 +118,7 @@ header {
 .hero {
     width:100%;
     height:380px;
-    background:url('https://www.gordenjogja.co.id/wp-content/uploads/2021/12/desain-kamar-kost-2.jpg') center/cover no-repeat;
+    background:url('https://i.pinimg.com/1200x/29/d2/bf/29d2bf4a0f9428dc592824b687588244.jpg') center/cover no-repeat;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -124,36 +129,34 @@ header {
     content:'';
     position:absolute;
     inset:0;
-    background:rgba(0, 0, 0, 0.16);
+    background:rgba(231, 231, 231, 0.46);
 }
 
 .hero-content {
     position:relative;
     z-index:3;
     text-align:center;
-    color:#fff;
+    color: #2e3a3fff;
     max-width:650px;
 }
 
 .hero-content h2 {
     font-size:42px;
-    font-weight:700;
-    font-family:'Poppins';
+    font-family:'Nunito Sans', sans-serif;
     line-height:1.2;
     margin-bottom:20px;
 }
 
 /* SEARCH */
 .search-box {
-    background:#fff;
+    background: #ffffff;
     width:600px;
     padding:15px 20px;
     border-radius:12px;
     display:flex;
     align-items:center;
-    margin:20px auto 0;
-    box-shadow:0 4px 12px rgba(0,0,0,0.1);
-}
+    margin:20px auto 0;}
+    
 .search-box input {
     flex:1;
     padding:8px;
@@ -161,7 +164,7 @@ header {
     font-size:16px;
 }
 .search-box button {
-    background:#4aa3c7;
+    background: #567c8d;
     border:none;
     padding:10px 20px;
     border-radius:10px;
@@ -177,9 +180,8 @@ header {
 }
 .card-kos {
     border-radius:16px;
-    background:#fff;
+    background: #bfbcb3ff;
     overflow:hidden;
-    border:1px solid #eee;
     box-shadow:0 6px 15px rgba(0,0,0,0.08);
     transition:0.3s;
 }
@@ -196,19 +198,20 @@ header {
     padding:18px;
 }
 .card-title {
-    font-family:'Poppins';
+    font-family:'Nunito Sans', sans-serif;
     font-size:20px;
     font-weight:700;
+    color: #45475dff;
 }
 .card-meta {
-    color:#666;
+    color: #1c1d27ff;
     font-size:14px;
 }
 .price {
     margin-top:8px;
     font-size:22px;
     font-weight:700;
-    color:#2E7D32;
+    color: #262956ff;
 }
 
 /* FOOTER */
@@ -221,7 +224,7 @@ footer {
 }
 .footer-logo {
     font-size:22px;
-    font-family:'Poppins';
+    font-family:'Nunito Sans', sans-serif;
     font-weight:700;
     margin-bottom:5px;
 }
@@ -238,12 +241,12 @@ footer {
 <header>
     <div class="navbar">
         <a href="<?= $baseUrl ?>index.php" class="logo">
-            <img src="<?= $baseUrl ?>assets/uploads/logo.png" alt="NgekosAja.id">
+            <img src="<?= $baseUrl ?>assets/uploads/logo.png" alt="NgekosAja2.id">
         </a>
         <div class="nav-links">
         <?php if(!empty($_SESSION['user_id'])): ?> Halo, <b><?= htmlspecialchars($_SESSION['fullname'] ?? $_SESSION['username']) ?></b>      
             <a href="<?= $baseUrl . (($_SESSION['role'] ?? '') === 'pemilik' ? 'dashboard_owner.php' : 'dashboard_user.php') ?>" class="btn-outline">Dashboard</a>  
-            <a href="<?= $baseUrl ?>logout.php" class="btn-outline">Logout</a> <?php else: ?> <a href="<?= $baseUrl ?>login.php" class="btn-outline">Login</a> 
+            <a href="<?= $baseUrl ?>logout.php" class="btn-outline">Logout</a> <?php else: ?> <a href="<?= $baseUrl ?>login.php" class="btn-outline">Masuk</a> 
             <a href="<?= $baseUrl ?>register.php" class="btn-white" >Daftar</a> <?php endif; ?>
         </div>
     </div>
@@ -255,7 +258,7 @@ footer {
         <h2>Temukan kost terbaik dekat kampusmu!</h2>
 
         <form method="get" class="search-box">
-            <input name="q" value="<?= htmlspecialchars($q) ?>" placeholder="Cari kos atau kota...">
+            <input name="q" value="<?= htmlspecialchars($q) ?>" placeholder="Cari kos atau daerah...">
             <button type="submit">Cari</button>
         </form>
     </div>
@@ -270,11 +273,11 @@ footer {
         padding:40px;
         text-align:center;
         box-shadow:none;
-        border:2px dashed #ccc;
-        border-radius:16px;
-        background:#fff;
+        border:5px ridge #cbc7b8ff;
+        border-radius:10px;
+        background:#f5efeb;
     ">
-        <h3 style="color:#4aa3c7;margin-bottom:10px;">Kos Tidak Ditemukan</h3>
+        <h3 style="color:#567C8D;margin-bottom:10px;">Kos Tidak Ditemukan</h3>
         <p style="font-size:16px;color:#555;">
             Coba kata kunci lain atau 
             <a href="<?= $baseUrl ?>index.php" style="color:#4aa3c7;font-weight:600;text-decoration:none;">

@@ -79,10 +79,8 @@ if (file_exists(__DIR__ . '/includes/header.php')) include __DIR__ . '/includes/
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3>Dashboard Pemilik</h3>
         <div>
-            <span class="me-3">Halo, <b><?= htmlspecialchars($owner_fullname) ?></b></span>
             <a href="kos/add.php" class="btn btn-primary">Tambah Kos Baru</a>
-            <a href="logout.php" class="btn btn-outline-secondary ms-2">Logout</a>
-        </div>
+            </div>
     </div>
 
     <?php foreach ($messages as $m): ?>
@@ -99,13 +97,13 @@ if (file_exists(__DIR__ . '/includes/header.php')) include __DIR__ . '/includes/
                 $thumbUrl = !empty($k['thumb']) ? ($baseUrl . ltrim($k['thumb'], '/')) : "https://picsum.photos/seed/kos{$k['id']}/600/400";
             ?>
             <div class="col-md-6 col-lg-4">
-                <div class="card p-0" style="border-radius:12px;overflow:hidden;">
-                    <div style="height:180px;overflow:hidden;background:#f5f5f5">
+                <div class="card p-0" style="border-radius:12px;overflow:hidden;background: #c9c6bddc">
+                    <div style="height:180px;overflow:hidden;background: #b7b5b0ff">
                         <img src="<?= htmlspecialchars($thumbUrl) ?>" alt="thumb" style="width:100%;height:100%;object-fit:cover;">
                     </div>
-                    <div class="p-3">
+                    <div class="p-3" style="color: #404159ff;font-weight:700">
                         <h5 class="mb-1"><?= htmlspecialchars($k['name']) ?></h5>
-                        <div class="text-muted small mb-2"><?= htmlspecialchars($k['city']) ?> • <?= htmlspecialchars($k['type']) ?></div>
+                        <div class="text-muted small mb-2"><?= htmlspecialchars($k['address']) ?> • Tipe: <?= htmlspecialchars($k['type']) ?></div>
                         <div class="fw-bold mb-2">Rp <?= number_format($k['price'],0,',','.') ?> / bulan</div>
                         
                         <div class="d-flex gap-2">
@@ -118,8 +116,8 @@ if (file_exists(__DIR__ . '/includes/header.php')) include __DIR__ . '/includes/
                             </form>
                         </div>
 
-                        <div style="margin-top:8px;font-size:13px;color:#666">
-                            <?= (int)$k['total_kamar'] ?> kamar • <a href="dashboard_bookings.php?kos_id=<?= (int)$k['id'] ?>" style="text-decoration:none;color:#d9534f;font-weight:700;">
+                        <div style="margin-top:8px;font-size:13px;color: #666">
+                            <?= (int)$k['total_kamar'] ?> kamar • <a href="dashboard_bookings.php?kos_id=<?= (int)$k['id'] ?>" style="text-decoration:none;color: #94605eff;font-weight:700;">
                                 <?= (int)$k['pending_bookings'] ?> pengajuan
                             </a>
                         </div>

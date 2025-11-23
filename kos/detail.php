@@ -7,12 +7,13 @@ error_reporting(E_ALL);
 // Pastikan path ke db.php benar (naik satu folder)
 require_once __DIR__ . '/../db.php';
 
-$baseUrl = '/NgekosAja.id/';
+$baseUrl = '/NgekosAja2.id/';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($id <= 0) {
     echo "ID kos tidak valid."; exit;
 }
+
 
 // 1. Ambil data Kos + Owner
 $stmt = $pdo->prepare("SELECT k.*, u.fullname AS owner_name, u.phone AS owner_phone, u.email AS owner_email FROM kos k JOIN users u ON u.id = k.owner_id WHERE k.id = ? LIMIT 1");
@@ -75,8 +76,12 @@ if ($is_logged_in && $current_role === 'pemilik' && $_SESSION['user_id'] == $kos
 
 $pdo = null; // Tutup koneksi
 ?>
+<?php 
+include __DIR__ . '/../includes/header.php';
+?>
 <!doctype html>
-<html lang="id">
+<html lang="id"
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -84,14 +89,14 @@ $pdo = null; // Tutup koneksi
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root{
-            --primary:#00BFA6;
-            --secondary:#FF8A65;
-            --light:#FFFFFF;
-            --bg-light:#F4F8F9;
-            --dark:#263238;
+            --primary: #51537dff;
+            --secondary: #e0dbd4ff;
+            --light: #ffffffff;
+            --bg-light: #f5efeb ;
+            --dark: #42545dff;
             --text-muted:#607D8B;
-            --success:#388E3C;
-            --error:#C62828;
+            --success: #4f5477ff;
+            --error: #C62828;
         }
         *{box-sizing:border-box}
         body{font-family:'Nunito Sans',sans-serif;margin:0;background:var(--bg-light);color:var(--dark)}
@@ -100,8 +105,8 @@ $pdo = null; // Tutup koneksi
         
         /* Header & Nav */
         .topbar{display:flex;justify-content:space-between;align-items:center;padding:15px 0; margin-bottom:10px;}
-        .logo{font-family:'Poppins',sans-serif;font-weight:700;font-size:22px;color:var(--primary);text-decoration:none}
-        .btn-link{color:var(--primary);text-decoration:none;font-weight:600;}
+        .logo{font-family:'Nunito Sans',sans-serif;font-weight:700;font-size:22px;color:var(--primary);text-decoration:none}
+        .btn-link{color: #4e667dff;text-decoration:none;font-weight:600;}
         
         /* Layout Utama */
         .main-content{display:grid; grid-template-columns: 1fr 340px; gap:25px;}
@@ -117,10 +122,10 @@ $pdo = null; // Tutup koneksi
         .thumbs img.active, .thumbs img:hover{opacity:1; border:2px solid var(--primary);}
 
         /* Info Kos */
-        .info h1{font-family:'Poppins',sans-serif; margin:0 0 5px; font-size:28px;}
+        .info h1{font-family:'Nunito Sans',sans-serif; margin:0 0 5px; font-size:28px;}
         .meta{color:var(--text-muted); margin-bottom:15px; font-size:15px;}
-        .price{font-size:24px; font-weight:700; color:var(--success); margin-bottom:15px;}
-        .desc{line-height:1.6; color:#555;}
+        .price{font-size:24px; font-weight:700; color: #505d73ff; margin-bottom:15px;}
+        .desc{line-height:1.6; color:#555; text-align: justify}
 
         /* Daftar Kamar */
         .kamar-list{margin-top:25px;}
@@ -168,7 +173,7 @@ $pdo = null; // Tutup koneksi
         .close-btn{ background:none; border:none; font-size:24px; cursor:pointer; color:#999; }
         
         /* Review Section Style */
-        .review-card h3 { font-family:'Poppins',sans-serif; margin-top:0;}
+        .review-card h3 { font-family:'Nunito Sans',sans-serif; margin-top:0;}
         .star-rating { color: gold; }
         .star-empty { color: #ddd; }
         .review-item { border-top: 1px dashed #eee; padding: 15px 0; }
@@ -189,17 +194,6 @@ $pdo = null; // Tutup koneksi
             <?= htmlspecialchars($review_message) ?>
         </div>
     <?php endif; ?>
-
-    <div class="topbar">
-        <a href="<?= $baseUrl ?>index.php" class="logo">NgekosAja.id</a>
-        <div>
-            <?php if($is_logged_in): ?>
-                Hai, <?= htmlspecialchars($_SESSION['fullname'] ?? 'User') ?>
-            <?php else: ?>
-                <a href="<?= $baseUrl ?>login.php" class="btn-link">Login</a>
-            <?php endif; ?>
-        </div>
-    </div>
 
     <div style="margin-bottom:15px;">
         <a href="<?= htmlspecialchars($backUrl) ?>" class="btn-link">← Kembali</a>
@@ -292,7 +286,7 @@ $pdo = null; // Tutup koneksi
                         <button type="submit" class="btn btn-primary" style="margin-top:10px;">Kirim Ulasan</button>
                     </form>
                 <?php else: ?>
-                    <p style="color:var(--text-muted);">Hanya pengguna yang login sebagai **Pencari Kos** yang dapat memberikan ulasan.</p>
+                    <p style="color:var(--text-muted);">Hanya pengguna yang login sebagai Pencari Kos yang dapat memberikan ulasan.</p>
                     <a href="<?= $baseUrl ?>login.php" class="btn btn-login">Login Sekarang</a>
                 <?php endif; ?>
             </div>
