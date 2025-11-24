@@ -193,11 +193,7 @@ header {
     width:100%;
     height:200px;
     object-fit:cover;
-    display:block;
-    opacity:0;
-    transition:opacity .6s ease;
 }
-.card-kos img.visible { opacity:1; }
 .card-body {
     padding:18px;
 }
@@ -236,12 +232,6 @@ footer {
     margin-bottom:10px;
     opacity:0.9;
 }
-
-/* responsive */
-@media (max-width:700px) {
-    .hero { height:260px; }
-    .search-box { width:90%; padding:12px; }
-}
 </style>
 </head>
 
@@ -254,9 +244,9 @@ footer {
             <img src="<?= $baseUrl ?>assets/uploads/logo.png" alt="NgekosAja2.id">
         </a>
         <div class="nav-links">
-        <?php if(!empty($_SESSION['user_id'])): ?> Halo, <b><?= htmlspecialchars($_SESSION['fullname'] ?? $_SESSION['username']) ?></b>
-            <a href="<?= $baseUrl . (($_SESSION['role'] ?? '') === 'pemilik' ? 'dashboard_owner.php' : 'dashboard_user.php') ?>" class="btn-outline">Dashboard</a>
-            <a href="<?= $baseUrl ?>logout.php" class="btn-outline" id="logoutLink">Logout</a> <?php else: ?> <a href="<?= $baseUrl ?>login.php" class="btn-outline">Masuk</a>
+        <?php if(!empty($_SESSION['user_id'])): ?> Halo, <b><?= htmlspecialchars($_SESSION['fullname'] ?? $_SESSION['username']) ?></b>      
+            <a href="<?= $baseUrl . (($_SESSION['role'] ?? '') === 'pemilik' ? 'dashboard_owner.php' : 'dashboard_user.php') ?>" class="btn-outline">Dashboard</a>  
+            <a href="<?= $baseUrl ?>logout.php" class="btn-outline">Logout</a> <?php else: ?> <a href="<?= $baseUrl ?>login.php" class="btn-outline">Masuk</a> 
             <a href="<?= $baseUrl ?>register.php" class="btn-white" >Daftar</a> <?php endif; ?>
         </div>
     </div>
@@ -267,15 +257,15 @@ footer {
     <div class="hero-content">
         <h2>Temukan kost terbaik dekat kampusmu!</h2>
 
-        <form method="get" class="search-box" id="searchForm">
-            <input name="q" id="searchInput" value="<?= htmlspecialchars($q) ?>" placeholder="Cari kos atau daerah...">
+        <form method="get" class="search-box">
+            <input name="q" value="<?= htmlspecialchars($q) ?>" placeholder="Cari kos atau daerah...">
             <button type="submit">Cari</button>
         </form>
     </div>
 </div>
 
 <!-- LIST KOS -->
-<div class="kos-section" style="max-width:1200px;margin:50px auto;" id="kosSection">
+<div class="kos-section" style="max-width:1200px;margin:50px auto;">
 
 <?php if (empty($rows)): ?>
 
@@ -298,7 +288,7 @@ footer {
 
 <?php else: ?>
 
-    <div class="grid" id="gridList">
+    <div class="grid">
         <?php foreach($rows as $r):
 
             $thumb = !empty($r['thumb'])
@@ -307,7 +297,7 @@ footer {
         ?>
         <div class="card-kos">
             <a href="<?= $baseUrl ?>kos/detail.php?id=<?= (int)$r['id'] ?>" style="text-decoration:none;color:inherit;">
-                <img src="<?= htmlspecialchars($thumb) ?>" loading="lazy" alt="<?= htmlspecialchars($r['name']) ?>">
+                <img src="<?= htmlspecialchars($thumb) ?>" alt="<?= htmlspecialchars($r['name']) ?>">
                 <div class="card-body">
                     <div class="card-title"><?= htmlspecialchars($r['name']) ?></div>
 
@@ -332,10 +322,10 @@ footer {
 
 <!-- PAGINATION -->
 <?php if ($pages > 1): ?>
-    <div id="paginationBlock" style="text-align:center;margin-top:30px;display:flex;justify-content:center;gap:20px;align-items:center;">
+    <div style="text-align:center;margin-top:30px;display:flex;justify-content:center;gap:20px;align-items:center;">
 
         <?php if ($page > 1): ?>
-            <a class="pag-link" href="?<?= http_build_query(['q'=>$q,'page'=>$page-1]) ?>"
+            <a href="?<?= http_build_query(['q'=>$q,'page'=>$page-1]) ?>"
                style="padding:10px 18px;border-radius:10px;background:#4aa3c7;color:#fff;text-decoration:none;">
                &larr; Sebelumnya
             </a>
@@ -346,7 +336,7 @@ footer {
         </div>
 
         <?php if ($page < $pages): ?>
-            <a class="pag-link" href="?<?= http_build_query(['q'=>$q,'page'=>$page+1]) ?>"
+            <a href="?<?= http_build_query(['q'=>$q,'page'=>$page+1]) ?>"
                style="padding:10px 18px;border-radius:10px;background:#4aa3c7;color:#fff;text-decoration:none;">
                Selanjutnya &rarr;
             </a>
@@ -376,15 +366,7 @@ footer {
   // Utility: get element safely
   const $ = (s, root = document) => root.querySelector(s);
 
-  // 1) Debounced search input that updates query param after user berhenti mengetik
-  (function setupDebounceSearch() {
-    const input = $('#searchInput');
-    const form = $('#searchForm');
-    if (!input || !form) return;
-    let timer = null;
-    const delay = 600;
-
-    // if user submits via button, normal navigate (fallback)
+      // if user submits via button, normal navigate (fallback)
     form.addEventListener('submit', function (ev) {
       // allow default submit for progressive enhancement
     });
