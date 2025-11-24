@@ -1,4 +1,4 @@
-<?php
+<?php 
 // dashboard_user.php (versi lengkap dan siap pakai)
 // Menampilkan dashboard untuk user role 'pencari'
 // Pastikan db.php ada di root dan menyediakan $pdo

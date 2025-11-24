@@ -193,7 +193,11 @@ header {
     width:100%;
     height:200px;
     object-fit:cover;
+    display:block;
+    opacity:0;
+    transition:opacity .6s ease;
 }
+.card-kos img.visible { opacity:1; }
 .card-body {
     padding:18px;
 }
@@ -232,6 +236,12 @@ footer {
     margin-bottom:10px;
     opacity:0.9;
 }
+
+/* responsive */
+@media (max-width:700px) {
+    .hero { height:260px; }
+    .search-box { width:90%; padding:12px; }
+}
 </style>
 </head>
 
@@ -244,9 +254,9 @@ footer {
             <img src="<?= $baseUrl ?>assets/uploads/logo.png" alt="NgekosAja2.id">
         </a>
         <div class="nav-links">
-        <?php if(!empty($_SESSION['user_id'])): ?> Halo, <b><?= htmlspecialchars($_SESSION['fullname'] ?? $_SESSION['username']) ?></b>      
-            <a href="<?= $baseUrl . (($_SESSION['role'] ?? '') === 'pemilik' ? 'dashboard_owner.php' : 'dashboard_user.php') ?>" class="btn-outline">Dashboard</a>  
-            <a href="<?= $baseUrl ?>logout.php" class="btn-outline">Logout</a> <?php else: ?> <a href="<?= $baseUrl ?>login.php" class="btn-outline">Masuk</a> 
+        <?php if(!empty($_SESSION['user_id'])): ?> Halo, <b><?= htmlspecialchars($_SESSION['fullname'] ?? $_SESSION['username']) ?></b>
+            <a href="<?= $baseUrl . (($_SESSION['role'] ?? '') === 'pemilik' ? 'dashboard_owner.php' : 'dashboard_user.php') ?>" class="btn-outline">Dashboard</a>
+            <a href="<?= $baseUrl ?>logout.php" class="btn-outline" id="logoutLink">Logout</a> <?php else: ?> <a href="<?= $baseUrl ?>login.php" class="btn-outline">Masuk</a>
             <a href="<?= $baseUrl ?>register.php" class="btn-white" >Daftar</a> <?php endif; ?>
         </div>
     </div>
@@ -257,15 +267,15 @@ footer {
     <div class="hero-content">
         <h2>Temukan kost terbaik dekat kampusmu!</h2>
 
-        <form method="get" class="search-box">
-            <input name="q" value="<?= htmlspecialchars($q) ?>" placeholder="Cari kos atau daerah...">
+        <form method="get" class="search-box" id="searchForm">
+            <input name="q" id="searchInput" value="<?= htmlspecialchars($q) ?>" placeholder="Cari kos atau daerah...">
             <button type="submit">Cari</button>
         </form>
     </div>
 </div>
 
 <!-- LIST KOS -->
-<div class="kos-section" style="max-width:1200px;margin:50px auto;">
+<div class="kos-section" style="max-width:1200px;margin:50px auto;" id="kosSection">
 
 <?php if (empty($rows)): ?>
 
@@ -288,7 +298,7 @@ footer {
 
 <?php else: ?>
 
-    <div class="grid">
+    <div class="grid" id="gridList">
         <?php foreach($rows as $r):
 
             $thumb = !empty($r['thumb'])
@@ -297,7 +307,7 @@ footer {
         ?>
         <div class="card-kos">
             <a href="<?= $baseUrl ?>kos/detail.php?id=<?= (int)$r['id'] ?>" style="text-decoration:none;color:inherit;">
-                <img src="<?= htmlspecialchars($thumb) ?>" alt="<?= htmlspecialchars($r['name']) ?>">
+                <img src="<?= htmlspecialchars($thumb) ?>" loading="lazy" alt="<?= htmlspecialchars($r['name']) ?>">
                 <div class="card-body">
                     <div class="card-title"><?= htmlspecialchars($r['name']) ?></div>
 
@@ -322,10 +332,10 @@ footer {
 
 <!-- PAGINATION -->
 <?php if ($pages > 1): ?>
-    <div style="text-align:center;margin-top:30px;display:flex;justify-content:center;gap:20px;align-items:center;">
+    <div id="paginationBlock" style="text-align:center;margin-top:30px;display:flex;justify-content:center;gap:20px;align-items:center;">
 
         <?php if ($page > 1): ?>
-            <a href="?<?= http_build_query(['q'=>$q,'page'=>$page-1]) ?>"
+            <a class="pag-link" href="?<?= http_build_query(['q'=>$q,'page'=>$page-1]) ?>"
                style="padding:10px 18px;border-radius:10px;background:#4aa3c7;color:#fff;text-decoration:none;">
                &larr; Sebelumnya
             </a>
@@ -336,7 +346,7 @@ footer {
         </div>
 
         <?php if ($page < $pages): ?>
-            <a href="?<?= http_build_query(['q'=>$q,'page'=>$page+1]) ?>"
+            <a class="pag-link" href="?<?= http_build_query(['q'=>$q,'page'=>$page+1]) ?>"
                style="padding:10px 18px;border-radius:10px;background:#4aa3c7;color:#fff;text-decoration:none;">
                Selanjutnya &rarr;
             </a>
@@ -359,6 +369,156 @@ footer {
         <a href="#" style="color:white;text-decoration:none;margin:0 8px;">Kontak Kami</a>
     </div>
 </footer>
+
+<!-- JAVASCRIPT: debounce search, ajax pagination, image fade-in, logout confirm -->
+<script>
+(function () {
+  // Utility: get element safely
+  const $ = (s, root = document) => root.querySelector(s);
+
+  // 1) Debounced search input that updates query param after user berhenti mengetik
+  (function setupDebounceSearch() {
+    const input = $('#searchInput');
+    const form = $('#searchForm');
+    if (!input || !form) return;
+    let timer = null;
+    const delay = 600;
+
+    // if user submits via button, normal navigate (fallback)
+    form.addEventListener('submit', function (ev) {
+      // allow default submit for progressive enhancement
+    });
+
+    input.addEventListener('input', function () {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const q = input.value.trim();
+        const params = new URLSearchParams(window.location.search);
+        if (q) params.set('q', q); else params.delete('q');
+        params.set('page', '1'); // kembali ke halaman 1 saat cari baru
+        // gunakan pushState agar tidak membuat back/forward aneh
+        const newUrl = window.location.pathname + '?' + params.toString();
+        // navigasi full page agar server masih mengembalikan HTML lengkap
+        window.location.href = newUrl;
+      }, delay);
+    });
+  })();
+
+  // 2) AJAX pagination that fetches only kos-section partial when possible
+  (function setupAjaxPagination() {
+    const kosSection = document.getElementById('kosSection');
+    if (!kosSection) return;
+
+    // handle clicks inside kosSection (delegation)
+    kosSection.addEventListener('click', async function (ev) {
+      const a = ev.target.closest('a');
+      if (!a) return;
+      // only process links that look like pagination links
+      if (!a.classList.contains('pag-link')) return;
+
+      ev.preventDefault();
+      const href = a.href;
+      const url = new URL(href, window.location.origin);
+      url.searchParams.set('ajax', '1'); // request partial when possible
+
+      // set loading state
+      const prevText = a.textContent;
+      a.textContent = 'Memuat...';
+
+      try {
+        const res = await fetch(url.toString(), { credentials: 'same-origin' });
+        if (!res.ok) throw new Error('Network response not ok');
+
+        const html = await res.text();
+
+        // Try to find kos-section in returned HTML
+        // 1. If server returns only partial (kos-section), insert directly
+        // 2. Else extract <div id="kosSection">...</div> from full HTML
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const newSection = doc.getElementById('kosSection') || doc.querySelector('.kos-section') || null;
+
+        if (newSection) {
+          kosSection.innerHTML = newSection.innerHTML;
+        } else {
+          // fallback: if server returned partial without wrapper, try to guess .grid and pagination
+          const grid = doc.querySelector('#gridList, .grid');
+          const pag = doc.querySelector('#paginationBlock, .pagination, .pag-link');
+          if (grid) {
+            const existingGrid = kosSection.querySelector('#gridList, .grid');
+            if (existingGrid) existingGrid.replaceWith(grid);
+          }
+          if (pag) {
+            const existingPag = document.getElementById('paginationBlock') || document.querySelector('#paginationBlock');
+            if (existingPag) existingPag.replaceWith(pag);
+          }
+        }
+
+        // update URL in address bar
+        window.history.pushState(null, '', href);
+        // scroll user to top of results
+        window.scrollTo({ top: kosSection.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
+
+        // rerun image observer for newly injected images
+        runImageObserver();
+      } catch (err) {
+        console.error('AJAX pagination error', err);
+        alert('Gagal memuat halaman. Silakan coba lagi.');
+      } finally {
+        a.textContent = prevText;
+      }
+    });
+
+    // support back/forward to reload state
+    window.addEventListener('popstate', function () {
+      // simple approach: reload page so server decides what to show
+      location.reload();
+    });
+  })();
+
+  // 3) Image fade-in using IntersectionObserver
+  let imageObserver = null;
+  function runImageObserver() {
+    const imgs = document.querySelectorAll('.card-kos img[loading="lazy"]');
+    if (!('IntersectionObserver' in window)) {
+      // fallback: show images immediately
+      imgs.forEach(img => img.classList.add('visible'));
+      return;
+    }
+    if (imageObserver) imageObserver.disconnect();
+
+    imageObserver = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          img.classList.add('visible');
+          obs.unobserve(img);
+        }
+      });
+    }, { rootMargin: '50px 0px', threshold: 0.1 });
+
+    imgs.forEach(img => {
+      // if image already loaded, mark visible
+      if (img.complete && img.naturalWidth !== 0) {
+        img.classList.add('visible');
+      } else {
+        imageObserver.observe(img);
+      }
+    });
+  }
+  document.addEventListener('DOMContentLoaded', runImageObserver);
+
+  // 4) Confirm logout
+  (function setupLogoutConfirm() {
+    const logout = document.getElementById('logoutLink');
+    if (!logout) return;
+    logout.addEventListener('click', function (ev) {
+      if (!confirm('Yakin ingin logout?')) ev.preventDefault();
+    });
+  })();
+
+})();
+</script>
 
 </body>
 </html>
