@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="container my-5" style="max-width:900px;">
   <div class="card p-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h4 style="color:#00BFA6;font-family:'Poppins',sans-serif">Tambah Kos Baru</h4>
+      <h4 style="color: #5f647bff;font-family:'Nunito Sans',sans-serif">Tambah Kos Baru</h4>
       <a class="btn btn-outline-secondary" href="../dashboard_owner.php">Kembali</a>
     </div>
 

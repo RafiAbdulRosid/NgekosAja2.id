@@ -66,8 +66,10 @@ $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $pdo = null;
 ?>
+<?php include 'includes/header.php'; ?>
 <!doctype html>
 <html lang="id">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -75,35 +77,35 @@ $pdo = null;
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root{ --primary:#00BFA6; --secondary:#FF8A65; --light:#fff; --bg:#F4F8F9; --dark:#333; }
-        body{ font-family:'Nunito Sans',sans-serif; background:var(--bg); color:var(--dark); margin:0; }
+        body{ font-family:'Nunito Sans',sans-serif; background:#f5efeb; color:var(--dark); margin:0; }
         .wrap{ max-width:1000px; margin:30px auto; padding:0 20px; }
         
         /* Header */
         .header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; }
-        .btn-back{ text-decoration:none; color:var(--primary); font-weight:700; display:flex; align-items:center; gap:5px; }
+        .btn-back{ text-decoration:none; color: #555977ff; font-weight:700; display:flex; align-items:center; gap:5px; }
         
         /* Alert */
         .alert{ padding:15px; background:#d1e7dd; color:#0f5132; border-radius:10px; margin-bottom:20px; }
 
         /* Card List */
-        .booking-card{ background:var(--light); border-radius:12px; padding:20px; margin-bottom:20px; box-shadow:0 4px 15px rgba(0,0,0,0.05); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px; border-left:5px solid #ddd; }
+        .booking-card{ background: #cbcac8e8; border-radius:12px; padding:20px; margin-bottom:20px; box-shadow:0 4px 15px rgba(0,0,0,0.05); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px; border-left:5px solid #ddd; }
         
         /* Status Colors Border */
-        .booking-card.pending { border-left-color: #FFB74D; } /* Kuning */
-        .booking-card.approved { border-left-color: #00BFA6; } /* Hijau */
-        .booking-card.rejected { border-left-color: #EF5350; } /* Merah */
+        .booking-card.pending { border-left-color: #7c7c9eff; } /* Kuning */
+        .booking-card.approved { border-left-color: #6684b0ff; } /* Hijau */
+        .booking-card.rejected { border-left-color: #4b5376ff; } /* Merah */
 
-        .info h4{ margin:0 0 5px; font-family:'Poppins',sans-serif; font-size:18px; }
+        .info h4{ margin:0 0 5px; font-family:'Nunito Sans',sans-serif; font-size:18px; }
         .meta{ color:#666; font-size:14px; margin-bottom:5px; }
         .pencari{ font-weight:700; color:var(--primary); }
         
         .actions{ display:flex; gap:10px; align-items:center; }
         
         .btn{ padding:8px 16px; border-radius:8px; border:none; font-weight:700; cursor:pointer; transition:0.2s; text-decoration:none; display:inline-block; font-size:14px; }
-        .btn-acc{ background:var(--primary); color:#fff; }
+        .btn-acc{ background: #6a7181ff; color:#fff; }
         .btn-acc:hover{ background:#008f7a; }
-        .btn-tolak{ background:#fff; border:1px solid #EF5350; color:#EF5350; }
-        .btn-tolak:hover{ background:#FFEBEE; }
+        .btn-tolak{ background: #ffffff13; border:1px solid #8c4847ff; color:#EF5350; }
+        .btn-tolak:hover{ background: #FFEBEE; }
         .btn-wa{ background:#25D366; color:#fff; display:flex; align-items:center; gap:5px; }
 
         .badge{ padding:5px 10px; border-radius:20px; font-size:12px; font-weight:700; text-transform:uppercase; }
@@ -119,7 +121,7 @@ $pdo = null;
 <div class="wrap">
     <div class="header">
         <div>
-            <h2 style="margin:0; font-family:'Poppins',sans-serif;">Daftar Pengajuan Sewa</h2>
+            <h2 style="margin:0; font-family:'Nunito Sans',sans-serif;">Daftar Pengajuan Sewa</h2>
             <p style="margin:5px 0 0; color:#666;">Kelola siapa saja yang ingin masuk ke kos Anda.</p>
         </div>
         <a href="dashboard_owner.php" class="btn-back">&larr; Kembali ke Dashboard</a>
